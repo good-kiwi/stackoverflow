@@ -106,15 +106,25 @@ def find_optimal_lm_mod(X, y, cutoffs, test_size = .30, random_state=42, plot=Tr
     return r2_scores_test, r2_scores_train, lm_model, X_train, X_test, y_train, y_test
 
 def main():
-    df = pd.read_csv('../Part1/stackoverflow/survey_results_public.csv')
-    X, y = clean_data(df)
+    #df = pd.read_csv('data/survey-results-public.csv')
+
+    #X, y = clean_data(df)
     #cutoffs here pertains to the number of missing values allowed in the used columns.
     #Therefore, lower values for the cutoff provides more predictors in the model.
-    cutoffs = [5000, 3500, 2500, 1000, 100, 50, 30, 20, 10, 5]
+    #cutoffs = [5000, 3500, 2500, 1000, 100, 50, 30, 20, 10, 5]
 
-    r2_scores_test, r2_scores_train, lm_model, X_train, X_test, y_train, y_test = find_optimal_lm_mod(X, y, cutoffs, plot=False)
-    print('Finished Finding the Best Model')
-    return lm_model
+    #r2_scores_test, r2_scores_train, lm_model, X_train, X_test, y_train, y_test = find_optimal_lm_mod(X, y, cutoffs, plot=False)
+    #print('Finished Finding the Best Model')
+    #return lm_model
+    desired_width=320
+    pd.set_option('display.width', desired_width)
+    pd.set_option('display.max_columns', 12)
+    df_listings = pd.read_csv('data/listings_boston.csv')
+    print(df_listings.describe())
+    df_neighborhoods = pd.read_csv('data/neighbourhoods_boston.csv')
+    print(df_neighborhoods.describe())
+    df_reviews = pd.read_csv('data/reviews_boston.csv')
+    print(df_reviews.describe())
 
 
 if __name__ == '__main__':
