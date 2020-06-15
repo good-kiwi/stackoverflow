@@ -26,7 +26,7 @@ Data exploration, cleansing, and model building is done in the .py file
 
 ## Results<a name="results"></a>
 
-The main findings of the code can be found at the post available [here](https://medium.com/@joseph.cal/placeholder-for-airbnb-results-9d8affcc71b7?sk=586a28b033811a2bf15076d380297611).
+The main findings of the code can be found at the post available [here](https://medium.com/@joseph.cal/placeholder-for-airbnb-results-9d8affcc71b7).
 
 ## Licensing, Authors, Acknowledgements<a name="licensing"></a>
 
