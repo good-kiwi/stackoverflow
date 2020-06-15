@@ -376,27 +376,13 @@ def main():
     print(X.head())
     print(y.head())
     r2_scores_test, r2_scores_train, lm_model, X_train, X_test, y_train, y_test = find_optimal_lm_mod(X, y, [100, 1000, 2000, 3000], plot=plot)
-    if print_result:
+    if print_log:
         print(list(zip(X_train.columns, np.exp(lm_model.coef_))))
         print(r2_scores_train, r2_scores_test)
-
-    selected_vars=['neighbourhood_cleansed_Back Bay',
-                   'neighbourhood_cleansed_Bay Village', 'neighbourhood_cleansed_Beacon Hill',
-                   'neighbourhood_cleansed_Brighton', 'neighbourhood_cleansed_Charlestown',
-                   'neighbourhood_cleansed_Chinatown', 'neighbourhood_cleansed_Dorchester',
-                   'neighbourhood_cleansed_Downtown', 'neighbourhood_cleansed_East Boston',
-                   'neighbourhood_cleansed_Fenway', 'neighbourhood_cleansed_Hyde Park',
-                   'neighbourhood_cleansed_Jamaica Plain', 'neighbourhood_cleansed_Leather District',
-                   'neighbourhood_cleansed_Longwood Medical Area', 'neighbourhood_cleansed_Mattapan',
-                   'neighbourhood_cleansed_Mission Hill', 'neighbourhood_cleansed_North End',
-                   'neighbourhood_cleansed_Roslindale', 'neighbourhood_cleansed_Roxbury',
-                   'neighbourhood_cleansed_South Boston', 'neighbourhood_cleansed_South Boston Waterfront',
-                   'neighbourhood_cleansed_South End', 'neighbourhood_cleansed_West End']
 
     selected_vars=X_train.columns
 
     lm_model = LinearRegression(normalize=False)
-    print(X.columns)
     X = X[selected_vars]
     lm_model.fit(X, y)
     y_preds = lm_model.predict(X)
