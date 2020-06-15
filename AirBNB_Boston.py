@@ -19,7 +19,7 @@ def clean_data(df):
     y - the corresponding response vector
 
     This function cleans df using the following steps to produce X and y:
-    1. Drop rows with 0 price.
+    1. Drop rows with 0 price and outlier prices (prices above 2950)
     2. Create y as the price column, transformed by log
     3. Create X from selected columns
     4. Deal with missing values
@@ -28,15 +28,17 @@ def clean_data(df):
 
     # Drop rows with 0 price
     df = df[df.price > 0]
+    df = df[df.price < 2950]
 
     # Create y
     y = df['price'].apply(math.log)
 
     # Select columns for X
-    selected_vars = ['host_listings_count',
+    potential_vars = ['host_listings_count',
                      'calculated_host_listings_count_private_rooms',
                      'neighbourhood_cleansed',
                      'room_type',
+                     'property_type',
                      'beds',
                      'availability_365',
                      'number_of_reviews',
@@ -71,7 +73,7 @@ def clean_data(df):
                       'house_rules',
                       'host_about']
 
-    df = df[selected_vars]
+    df = df[potential_vars]
     # Deal with missing values
     df['number_of_reviews'].fillna(0, inplace=True)
     df[bool_vars].fillna('f', inplace=True)
@@ -94,10 +96,8 @@ def clean_data(df):
     df[bool_vars].dtype = int
     df[free_text_vars] = df[free_text_vars].apply(create_bool, axis=0)
     df[free_text_vars].dtype = int
-    for col in bool_vars:
-        print(col, ":", df[col].apply(type).value_counts())
     # Dummy the categorical variables
-    cat_vars = ['neighbourhood_cleansed', 'room_type']
+    cat_vars = ['neighbourhood_cleansed', 'room_type', 'property_type']
     for var in cat_vars:
         # for each cat add dummy var, drop original column
         df = pd.concat([df.drop(var, axis=1), pd.get_dummies(df[var], prefix=var, prefix_sep='_', drop_first=True)], axis=1)
@@ -171,7 +171,7 @@ def find_optimal_lm_mod(X, y, cutoffs, test_size = .30, random_state=42, plot=Tr
 
 def main():
     plot = False  # set to true if you would like to see plots
-    print_log = False  # set to true if you would like to see stats outputted to console
+    print_log = True  # set to true if you would like to see stats outputted to console
     print_result = True
 
     # Data Exploration
@@ -330,6 +330,7 @@ def main():
     if print_log:
         for col in df_listings[cat_vars].columns:
             print(df_listings[[col, 'price']].groupby([col]).mean())
+            print(df_listings[col].value_counts())
 
     # free text columns: space, description, neighborhood_overview, notes, transit, access, interaction, house_rules,
     #  host_name, host_about,
@@ -372,12 +373,39 @@ def main():
         plt.plot(linspace, pdf_lognorm, label="lognorm")
         plt.show()
     X, y = clean_data(df_listings)
-    r2_scores_test, r2_scores_train, lm_model, X_train, X_test, y_train, y_test = find_optimal_lm_mod(X, y, [100, 1000, 2000, 3000])
+    print(X.head())
+    print(y.head())
+    r2_scores_test, r2_scores_train, lm_model, X_train, X_test, y_train, y_test = find_optimal_lm_mod(X, y, [100, 1000, 2000, 3000], plot=plot)
     if print_result:
-        print('test r2: ', r2_scores_test)
-        print('train r2:', r2_scores_train)
         print(list(zip(X_train.columns, np.exp(lm_model.coef_))))
+        print(r2_scores_train, r2_scores_test)
 
+    selected_vars=['neighbourhood_cleansed_Back Bay',
+                   'neighbourhood_cleansed_Bay Village', 'neighbourhood_cleansed_Beacon Hill',
+                   'neighbourhood_cleansed_Brighton', 'neighbourhood_cleansed_Charlestown',
+                   'neighbourhood_cleansed_Chinatown', 'neighbourhood_cleansed_Dorchester',
+                   'neighbourhood_cleansed_Downtown', 'neighbourhood_cleansed_East Boston',
+                   'neighbourhood_cleansed_Fenway', 'neighbourhood_cleansed_Hyde Park',
+                   'neighbourhood_cleansed_Jamaica Plain', 'neighbourhood_cleansed_Leather District',
+                   'neighbourhood_cleansed_Longwood Medical Area', 'neighbourhood_cleansed_Mattapan',
+                   'neighbourhood_cleansed_Mission Hill', 'neighbourhood_cleansed_North End',
+                   'neighbourhood_cleansed_Roslindale', 'neighbourhood_cleansed_Roxbury',
+                   'neighbourhood_cleansed_South Boston', 'neighbourhood_cleansed_South Boston Waterfront',
+                   'neighbourhood_cleansed_South End', 'neighbourhood_cleansed_West End']
+
+    selected_vars=X_train.columns
+
+    lm_model = LinearRegression(normalize=False)
+    print(X.columns)
+    X = X[selected_vars]
+    lm_model.fit(X, y)
+    y_preds = lm_model.predict(X)
+
+    if print_result:
+        print(list(zip(X.columns, np.exp(lm_model.coef_))))
+        print(r2_score(y, y_preds))
+        sns.residplot(y, y_preds)
+        plt.show()
     return lm_model
 
 
