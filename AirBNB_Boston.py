@@ -12,13 +12,13 @@ import math
 def clean_data(df):
     """
     INPUT
-    df - pandas dataframe
+    df_listings - pandas dataframe
 
     OUTPUT
     X - A matrix holding all of the variables you want to consider when predicting the response
     y - the corresponding response vector
 
-    This function cleans df using the following steps to produce X and y:
+    This function cleans df_listings using the following steps to produce X and y:
     1. Drop rows with 0 price and outlier prices (prices above 2950)
     2. Create y as the price column, transformed by log
     3. Create X from selected columns
